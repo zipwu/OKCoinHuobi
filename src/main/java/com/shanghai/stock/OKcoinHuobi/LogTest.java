@@ -1,11 +1,7 @@
 package com.shanghai.stock.OKcoinHuobi;
 
-import java.util.Properties;
-
-import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.chainsaw.Main;
 
 public class LogTest {
 	

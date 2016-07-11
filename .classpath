@@ -22,6 +22,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/admin/workspace/OKcoinHuobi/lib/commons-codec-1.7.jar"/>
 	<classpathentry kind="lib" path="C:/Users/admin/workspace/OKcoinHuobi/lib/commons-io-2.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/admin/workspace/OKcoinHuobi/lib/commons-logging-1.0.4.jar"/>
