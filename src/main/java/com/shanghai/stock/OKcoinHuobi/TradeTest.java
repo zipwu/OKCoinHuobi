@@ -48,6 +48,7 @@ public class TradeTest implements Runnable {
     //private static String GET_ORDERS = "get_orders";
     //private static String ORDER_INFO = "order_info";
     private static String SELL = "sell";
+    private static String WITHDRAW = "withdraw_coin";
     //private static String SELL_MARKET = "sell_market";
 
 	public static void main(String[] args) {
