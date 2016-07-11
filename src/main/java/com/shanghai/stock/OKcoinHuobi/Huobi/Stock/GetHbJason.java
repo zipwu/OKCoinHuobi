@@ -1,4 +1,4 @@
-package com.shanghai.stock.OKcoinHuobi.OKcoin.Util;
+package com.shanghai.stock.OKcoinHuobi.Huobi.Stock;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class GetRest {
+public class GetHbJason {
 	
-	public String GetString() throws IOException{
+	public String GetBtcJason() throws IOException{
 		URL url = null;
 		url = new URL("http://api.huobi.com/staticmarket/detail_btc_json.js");
 		HttpURLConnection connet;
@@ -22,7 +22,7 @@ public class GetRest {
 		return restString;
 	}
 	
-	public String GetLtcString() throws IOException{
+	public String GetLtcJason() throws IOException{
 		URL url = null;
 		url = new URL("http://api.huobi.com/staticmarket/detail_ltc_json.js");
 		HttpURLConnection connet;
@@ -36,9 +36,7 @@ public class GetRest {
 		return restString;
 	}
 	
-	
-	
-	
+
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		URL url = null;

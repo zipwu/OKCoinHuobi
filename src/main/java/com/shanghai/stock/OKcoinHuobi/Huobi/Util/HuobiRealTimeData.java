@@ -1,4 +1,4 @@
-package com.shanghai.stock.OKcoinHuobi.OKcoin.Util;
+package com.shanghai.stock.OKcoinHuobi.Huobi.Util;
 
 public class HuobiRealTimeData {
 	float last_price;

@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import org.apache.http.HttpException;
 
+import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.GetRest;
 import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.HuobiService;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.IStockApi;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.StockApi;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.ChangeString;
-import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.GetRest;
 
 public class CalAverage implements Runnable {
 	

@@ -7,12 +7,12 @@ import java.util.Date;
 
 import org.apache.http.HttpException;
 
+import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.GetRest;
 import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.HuobiService;
+import com.shanghai.stock.OKcoinHuobi.Huobi.Util.HuobiRealTimeData;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.IStockApi;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.StockApi;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.ChangeString;
-import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.GetRest;
-import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.HuobiRealTimeData;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Util.OKCoinRealTimeData;
 
 public class CatchInfo implements Runnable{

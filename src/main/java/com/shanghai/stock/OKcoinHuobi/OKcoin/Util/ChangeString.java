@@ -2,7 +2,9 @@ package com.shanghai.stock.OKcoinHuobi.OKcoin.Util;
 
 import org.json.JSONObject;
 
+import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.GetRest;
 import com.shanghai.stock.OKcoinHuobi.Huobi.Stock.HuobiService;
+import com.shanghai.stock.OKcoinHuobi.Huobi.Util.HuobiRealTimeData;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.IStockApi;
 import com.shanghai.stock.OKcoinHuobi.OKcoin.Stock.StockApi;
 
