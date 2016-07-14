@@ -67,6 +67,10 @@ public class StockApi implements IStockApi {
 	 * 现货 获取历史订单信息，只返回最近七天的信息URL
 	 */
 	private final String ORDER_HISTORY_URL = "/api/v1/order_history.do";
+	/**
+	 * 提币URL
+	 */
+	private final String WITHDRAW_URL = "/api/v1/withdraw.do";
 	
 	public StockApi(String url_prex,String api_key,String secret_key){
 		this.api_key = api_key;
@@ -311,6 +315,37 @@ public class StockApi implements IStockApi {
 
 	public void setUrl_prex(String url_prex) {
 		this.url_prex = url_prex;
+	}
+
+	public String withdraw(String symbol, String chargefee, String trade_pwd, String withdraw_address,
+			String withdraw_amount) throws HttpException, IOException {
+		// TODO Auto-generated method stub
+		Map<String, String> params = new HashMap<String,String>();
+		params.put("api_key", api_key);
+		if(!StringUtil.isEmpty(symbol)){
+			params.put("symbol", symbol);
+		}
+		if(!StringUtil.isEmpty(chargefee)){
+			params.put("chargefee", chargefee);
+		}
+		if(!StringUtil.isEmpty(trade_pwd)){
+			params.put("trade_pwd", trade_pwd);
+		}
+		if(!StringUtil.isEmpty(withdraw_address)){
+			params.put("withdraw_address", withdraw_address);
+		}
+		if(!StringUtil.isEmpty(withdraw_amount)){
+			params.put("withdraw_amount", withdraw_amount);
+		}
+		String sign = MD5Util.buildMysignV1(params, this.secret_key);
+		params.put("sign", sign);
+		
+		// 发送post请求
+		HttpUtilManager httpUtil = HttpUtilManager.getInstance();
+		String result = httpUtil.requestHttpPost(url_prex,this.WITHDRAW_URL,
+				params);
+
+		return result;
 	}
 
 }

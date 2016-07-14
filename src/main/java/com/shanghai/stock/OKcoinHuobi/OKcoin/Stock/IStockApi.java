@@ -115,6 +115,10 @@ public interface IStockApi {
 	*/
 	public String order_history(String symbol, String status,
 			String current_page, String page_length) throws HttpException, IOException;
+	
+	public String withdraw(String symbol,String chargefee,String trade_password,
+			String withdraw_address,String withdraw_amount) throws HttpException, IOException;
+
 
 }
 

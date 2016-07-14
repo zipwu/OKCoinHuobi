@@ -11,7 +11,7 @@ public class LogTest {
 		logger.warn("error");
 		
 		logger.info("sss");
-		
+		logger.error("报错");
 		logger.info("成交");
 	}
 	

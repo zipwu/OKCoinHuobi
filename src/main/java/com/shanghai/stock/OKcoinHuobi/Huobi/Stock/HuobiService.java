@@ -275,4 +275,36 @@ public class HuobiService {
         }
         return base.post(paraMap, Base.HUOBI_API_URL);
     }
+    
+    /**
+     * 提币
+     * 
+     * @param coinType
+     * @param amount
+     * @param address
+     * @param coinType
+     * @param method
+     * 
+     * @return
+     */
+    
+    public String withDraw_coin(int coinType, String address, String amount, String tradePassword,String method)
+			throws Exception{
+		TreeMap<String, Object> paraMap = new TreeMap<String, Object>();
+		Base base = new Base();
+		paraMap.put("method", method);
+		paraMap.put("created", base.getTimestamp());
+		paraMap.put("access_key", Base.HUOBI_ACCESS_KEY);
+        paraMap.put("secret_key", Base.HUOBI_SECRET_KEY);
+		paraMap.put("coin_type", coinType);
+		paraMap.put("withdraw_address", address);
+		paraMap.put("withdraw_amount", amount);
+		String md5 = base.sign(paraMap);
+		paraMap.remove("secret_key");
+		paraMap.put("sign",md5);
+		if(StringUtils.isNotEmpty(tradePassword)){
+			paraMap.put("trade_password",tradePassword);
+		}
+		return base.post(paraMap,Base.HUOBI_API_URL);
+    }
 }
