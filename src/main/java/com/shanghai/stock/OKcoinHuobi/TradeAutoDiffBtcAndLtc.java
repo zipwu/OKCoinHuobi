@@ -1,6 +1,8 @@
 package com.shanghai.stock.OKcoinHuobi;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Date;
 
 import org.apache.http.HttpException;
@@ -19,16 +21,24 @@ public class TradeAutoDiffBtcAndLtc {
 	private static int LTCPERTIME = 12;
 	private static float MINCASH = 1000;
 	private static float MINBTCLEFT = 1;
-	private static float MINLTCLEFT = 50;
+	private static float MINLTCLEFT = 40;
 	private static float BALANCETRIGGER = (float) 0.5;
-	private static float LTCBALANCETRIGGER = 50;
+	private static float LTCBALANCETRIGGER = 40;
+	
 	//private static float MINLTCLEFT = 0;
 	//private static float CONSTBTC = (float) 0.2;
 	//private static float CONSTLTC = 30;
 	//private static float MINDIFF = (float) 0.5;//
-	private static float INITLTC = 3000;
+	private static float INITLTC = 1000;
 	private static float INITBTC = (float) 132.64;
 	private static float INITCNY = (float) 1941841.59;
+	private static String OKCOINBTCADDRESS = "19mFDiWsiSbnwXFdUFbp1jjLTL1BvGfiqA";
+	private static String HBBTCADDRESS = "13PmX9H7uym1tqJdSjjuMf6b9Pv7zh9SFN";
+	private static String WITHDRAWPASSWORD = "g0ug0uiibb";
+	private static String WITHDRAWCHARGEFEE = "0.0003";
+	private static String WITHDRAWAMOUNT = "40";
+	private static String WITHDRAWTHRESHOLD = "100";  //BTC转币触发值
+	private static String WITHDRAW = "withdraw_coin";
  
 	//private float okCoinBtc;
 	//private float okCoinLtc;
@@ -59,6 +69,7 @@ public class TradeAutoDiffBtcAndLtc {
 		// TODO Auto-generated method stub
 		TradeAutoDiffBtcAndLtc tradeAutoDiffBtcAndLtc = new TradeAutoDiffBtcAndLtc();
 		tradeAutoDiffBtcAndLtc.run();
+		
 
 	}
 	
@@ -81,10 +92,11 @@ public class TradeAutoDiffBtcAndLtc {
 		 int bigLtcPerTimes=0;
 		 int tradesLTC = 0;
 		 int count=0;
-	 while(true){
-		 Date date = new Date();
+		 int withdrawOK2HB = 0;
+		 int withdrawHB2OK = 0;
 		 float diff = 0;
-		 float diffLTC = 0;
+		 int balancetrigtime = 0;
+		 
 		 float LtcDept = 0;
 		 String HuoBTCLastPrice = null;
 		 String OKCoinBTCLastPrice = null;
@@ -94,13 +106,23 @@ public class TradeAutoDiffBtcAndLtc {
 		 String HuoAccountInfo = null;
 		 float ratioBtc = 0;
 		 float ratioLtc = 0;
-  
+	 while(true){
+		 Date date = new Date();
+		 float diffLTC = 0;
+		 long cdate =date.getTime();
 	  try {
+		  //Shou 7.15
+		  FileOutputStream bos = new FileOutputStream("output/"+cdate+"_"+count+".txt");
+		  System.setOut(new PrintStream(bos));
+		  
+		  //end
+		  
+		  
 		  OkAccountInfo = okcoinPost.userinfo();
 		  HuoAccountInfo = service.getAccountInfo(ACCOUNT_INFO);
 		  HuoData = ChangeString.getHuoAsset(HuoAccountInfo);//获取huobi的账户信息类对象
 		  OkCoinData = ChangeString.getOKAsset(OkAccountInfo);//获取OK的账户信息类对象
-		  Thread.sleep(200);
+		  Thread.sleep(100);
 		  } catch (Exception e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
@@ -109,7 +131,8 @@ public class TradeAutoDiffBtcAndLtc {
 	  try {
 		  HuoBTCLastPrice = ChangeString.HuoJ2O(getRest.GetString());
 		  OKCoinBTCLastPrice = ChangeString.OKCJ2O(okcoinGet.ticker("btc_cny"));
-		  count++;System.out.println(date+"counter"+count);
+		  count++;
+		  System.out.println(date+"  counter"+count);
 		  ratioBtc = Float.valueOf(OKCoinBTCLastPrice)/Float.valueOf(HuoBTCLastPrice);
 		  diff = Float.valueOf(OKCoinBTCLastPrice)-Float.valueOf(HuoBTCLastPrice);
 		  System.out.println("BTC差价： "+ diff);
@@ -150,9 +173,10 @@ public class TradeAutoDiffBtcAndLtc {
 		    	//System.out.println((OkCoinData.free_btc+HuoData.free_btc));
 		    	//int temp =Math.round((freeBTC-OkCoinData.free_btc-HuoData.free_btc)/BALANCETRIGGER);
 		    	//System.out.println(temp);
-		    	errors++;
+		    	errors++; balancetrigtime++;
 			     if (diff>=0) {
 			    	 System.out.println(buyBtcAtHuoBi(service, twopoint(Float.valueOf(HuoBTCLastPrice)+30),twopoint(BALANCETRIGGER/2))); 
+			    	
 			     }
 			     if (diff<0) {
 			    	 System.out.println(buyBtcAtOkCoin(okcoinPost, twopoint(Float.valueOf(OKCoinBTCLastPrice)+30), twopoint(BALANCETRIGGER/2)));
@@ -167,35 +191,9 @@ public class TradeAutoDiffBtcAndLtc {
 			    	 System.out.println(sellBtcAtHuoBi(service, twopoint(Float.valueOf(HuoBTCLastPrice)-30),twopoint(BALANCETRIGGER/2)));
 			     }
 		    }
-		 //   System.out.println(0);
-		    //Shou 2016.7.10 6000ltc
-		    //多种额度转移LTC
-		    if(OkCoinData.free_ltc+HuoData.free_ltc>=2900){
-		    	freeLTC = INITLTC;
-		    }else if (OkCoinData.free_ltc+HuoData.free_ltc>1900 && OkCoinData.free_ltc+HuoData.free_ltc<2100) {
-		   		freeLTC = INITLTC-1000;
-			}else if (OkCoinData.free_ltc+HuoData.free_ltc>900 && OkCoinData.free_ltc+HuoData.free_ltc<1100) {
-				freeLTC = INITLTC-2000;
-			}else if (OkCoinData.free_ltc+HuoData.free_ltc>20 && OkCoinData.free_ltc+HuoData.free_ltc<300) {
-				freeLTC = INITLTC-2800;
-			}
-		    //配平
-		    if (freeLTC-OkCoinData.free_ltc-HuoData.free_ltc>LTCBALANCETRIGGER) {
-				if (diffLTC>=0) {
-					System.out.println(buyLtcAtHuoBi(service, twopoint(Float.valueOf(HuoLTCLastPrice)+1), twopoint(LTCBALANCETRIGGER)/3));
-				}
-				if (diffLTC<0) {
-					System.out.println(buyLtcAtOkCoin(okcoinPost, twopoint(Float.valueOf(OKCoinLTCLastPrice)+1), twopoint(LTCBALANCETRIGGER)/3));
-				}
-			}else if (freeLTC-OkCoinData.free_ltc-HuoData.free_ltc<-LTCBALANCETRIGGER) {
-				if (diffLTC>=0) {
-					System.out.println(sellLtcAtOkCoin(okcoinPost, twopoint(Float.valueOf(OKCoinLTCLastPrice)-1), twopoint(LTCBALANCETRIGGER)/3));
-				}
-				if (diffLTC<0) {
-					System.out.println(sellLtcAtHuoBi(service, twopoint(Float.valueOf(HuoLTCLastPrice)-1), twopoint(LTCBALANCETRIGGER)/3));
-				}
-			}
+		    
 		    float ratioOKCash =  OkCoinData.free_cny/(OkCoinData.free_cny+HuoData.free_cny);
+		    //System.out.println(ratioOKCash);
 		    //realtime diff
 		    //Shou 调整了参数，更符合实际16.7.8
 		    float realTimeDiff = 0;
@@ -210,9 +208,9 @@ public class TradeAutoDiffBtcAndLtc {
 		    	realTimeDiff = (float) 2.6;
 		    	realTimeLTCDiff = (float) 0.02;
 		    }else if (ratioOKCash>0.6) {
-		    	realTimeDiff = (float) 1.6;
+		    	realTimeDiff = (float) 1.2;
 		    }else if (ratioOKCash>0.52) {
-		    	realTimeDiff = (float) 1;
+		    	realTimeDiff = (float) 0.5;
 		    	
 		    }else if (ratioOKCash<0.1) {
 		    	realTimeDiff = (float) -3.6;
@@ -224,14 +222,14 @@ public class TradeAutoDiffBtcAndLtc {
 		    	realTimeDiff = (float) -2.6;
 		    	realTimeLTCDiff = (float) -0.02;
 		    }else if (ratioOKCash<0.4) {
-		    	realTimeDiff = (float) -1.6;
-		    }else if (ratioOKCash<0.45) {
-		    	realTimeDiff = (float) -1;
+		    	realTimeDiff = (float) -1.2;
+		    }else if (ratioOKCash<0.48) {
+		    	realTimeDiff = (float) -0.5;
 		    }else {  
 		    	realTimeDiff = 0;
 		    	realTimeLTCDiff = (float) 0;
 		    }
-		  //  System.out.println(1);
+		    //System.out.println(1);
 	    //(6.2,0.2)170(5.2,-0.8)145(4.2,-1.8)121(3,-3)72(1.8,-4.2)50(0.8,-5.2)24(-0.2,-6.2)
 	    //HY 2016/7/9  dan ci jiao yi e ti sheng
 		//Shou.16.7.8 start 0.7bei jia cha jiao yi 0.04 btc
@@ -274,7 +272,7 @@ public class TradeAutoDiffBtcAndLtc {
 			    	miniDiffTimes++;
 			    }
 		   
-		//    System.out.println(2);
+		    //System.out.println(2);
 		    
 		    // 2016.07.11 HY 
 		    // da e mai mai
@@ -284,6 +282,34 @@ public class TradeAutoDiffBtcAndLtc {
 		    ratioLtc = Float.valueOf(OKCoinLTCLastPrice)/Float.valueOf(HuoLTCLastPrice);
 		    diffLTC = Float.valueOf(OKCoinLTCLastPrice)-Float.valueOf(HuoLTCLastPrice);
 		    System.out.println("LTC差价： "+ diffLTC);
+		    //System.out.println(0);
+		    //Shou 2016.7.10 6000ltc
+		    //多种额度转移LTC
+		    if(OkCoinData.free_ltc+HuoData.free_ltc>=800){
+		    	freeLTC = INITLTC;
+		    	//System.out.println(0.1);
+		    }else if (OkCoinData.free_ltc+HuoData.free_ltc>500 && OkCoinData.free_ltc+HuoData.free_ltc<700) {
+		   		freeLTC = INITLTC-400;
+			}else if (OkCoinData.free_ltc+HuoData.free_ltc>100 && OkCoinData.free_ltc+HuoData.free_ltc<300) {
+				freeLTC = INITLTC-800;
+			}
+		    //配平
+		    if (freeLTC-OkCoinData.free_ltc-HuoData.free_ltc>LTCBALANCETRIGGER) {
+		    	 balancetrigtime++;errors++;
+				if (diffLTC>=0) {
+					System.out.println(buyLtcAtHuoBi(service, twopoint(Float.valueOf(HuoLTCLastPrice)+1), twopoint(LTCBALANCETRIGGER)/2));
+				}
+				if (diffLTC<0) {
+					System.out.println(buyLtcAtOkCoin(okcoinPost, twopoint(Float.valueOf(OKCoinLTCLastPrice)+1), twopoint(LTCBALANCETRIGGER)/2));
+				}
+			}else if (freeLTC-OkCoinData.free_ltc-HuoData.free_ltc<-LTCBALANCETRIGGER) {
+				if (diffLTC>=0) {
+					System.out.println(sellLtcAtOkCoin(okcoinPost, twopoint(Float.valueOf(OKCoinLTCLastPrice)-1), twopoint(LTCBALANCETRIGGER)/2));
+				}
+				if (diffLTC<0) {
+					System.out.println(sellLtcAtHuoBi(service, twopoint(Float.valueOf(HuoLTCLastPrice)-1), twopoint(LTCBALANCETRIGGER)/2));
+				}
+			}
 		  /*  if(LtcDept>=500)
 		    {
 		    	if(diffLTC<=-0.029) //币不是整数
@@ -355,7 +381,22 @@ public class TradeAutoDiffBtcAndLtc {
 		  //end old ltc
 		  
 		// }
-
+		/*
+		 * 转币部分
+		 */
+		
+		if (HuoData.free_btc >= Float.valueOf(WITHDRAWTHRESHOLD)) {
+			System.out.println(service.withDraw_coin(1, OKCOINBTCADDRESS, WITHDRAWAMOUNT, WITHDRAWPASSWORD, WITHDRAW));
+			withdrawHB2OK++;
+			
+		}else if (OkCoinData.free_btc >= Float.valueOf(WITHDRAWTHRESHOLD)) {
+			System.out.println(okcoinPost.withdraw("btc_cny", WITHDRAWCHARGEFEE, WITHDRAWPASSWORD, HBBTCADDRESS, WITHDRAWAMOUNT));
+			withdrawOK2HB++;
+		}
+		/*
+		 *
+		 * 
+		 */
 		float increTotal = increCNY + increBTC*(Float.valueOf(OKCoinBTCLastPrice)+Float.valueOf(HuoBTCLastPrice))/2
 					  +increLTC*(Float.valueOf(OKCoinLTCLastPrice)+Float.valueOf(HuoLTCLastPrice))/2;
 		System.out.println("人民币增量："+ increCNY+" BTC增量： "+ increBTC+"  LTC增量： "+ increLTC);
@@ -364,18 +405,21 @@ public class TradeAutoDiffBtcAndLtc {
 		double temp3b=0.04+(realTimeLTCDiff);
 	    float bigDiffa = (float)2*(-3+realTimeDiff);
 	    float bigDiffb = (float)2*(3+realTimeDiff);
-	    float smallDiffa = (float)0.7 * (-3+realTimeDiff);
-	    float smallDiffb = (float)0.7 * (3+realTimeDiff);
-	    System.out.println("LTC交易次数: "+tradesLTC+/*"   LTC回流次数: "+cashBackLtcTimes+*/"   realtimeLTCdiff:"+realTimeLTCDiff+"  ltcgap:(-无穷,"+(float)temp3a +"),("+(float)temp3b+",+无穷)");
+	//    float smallDiffa = (float)0.7 * (-3+realTimeDiff);
+	//    float smallDiffb = (float)0.7 * (3+realTimeDiff);
+	    System.out.println("LTC交易次数: "+tradesLTC+/*"   LTC回流次数: "+cashBackLtcTimes+"   realtimeLTCdiff:"+realTimeLTCDiff+*/"  ltcgap:(-无穷,"+(float)temp3a +"),("+(float)temp3b+",+无穷)");
 	  //  System.out.println("LTC资金回流次数: "+cashBackLtcTimes+"  单次45个币次数："+bigLtcPerTimes); 
-	    System.out.println("   realtimediff:"+realTimeDiff+"   BTC diff:"+ normalDiffTimes+ "  diff*0.7:"+smallDiffTimes+" 0.5*diff:"+ miniDiffTimes+"  diff*2:"+bigDiffTimes+ "  0.7diff:("+smallDiffa+","+smallDiffb+ ")  2diff:("+bigDiffa+","+bigDiffb+")");
+	    System.out.println("   realtimediff:"+realTimeDiff+"   BTC diff:"+ normalDiffTimes+ "    diff*0.7:"+smallDiffTimes+"  0.5*diff:"+ miniDiffTimes+"   diff*2:"+bigDiffTimes+/* "  0.7diff:("+smallDiffa+","+smallDiffb+*/ " 2diff:("+bigDiffa+","+bigDiffb+")");
 	    //Shou 16.7.8   end
+	//    System.out.println(
+	    System.out.println("转币huo2ok: "+withdrawHB2OK+"   ok2huo: "+withdrawOK2HB+"    OKfreebtc:"+  OkCoinData.free_btc+  "    OKfreeltc:"+OkCoinData.free_ltc +"   cny:   "+OkCoinData.free_cny );
 		System.out.println("总增量： "+ increTotal);
-		System.out.println("================");
+		System.out.println("errors"+balancetrigtime );
 		Thread.sleep(200);
 	   } catch (Exception e) {
 	    // TODO: handle exception
 	   }
+	  
 	   
 	  }
 	 }
