@@ -40,8 +40,8 @@ public class TradeAutoDiff implements Runnable{
 	//private float[] coinBtcDiff; //OkCoin-HuoBi
 	//private float[] coinLtcDiff; //OkCoin-HuoBi
  
-	private static String API_KEY = "bce9358d-54e9-4cfb-b22d-3546e10e7dc1";  //OKCoin申请的apiKey
-	private static String SECRET_KEY = "6641776BE6A7E7EEAC1D710569F3B0D2";  //OKCoin 申请的secret_key
+	private static String API_KEY = "";  //OKCoin申请的apiKey
+	private static String SECRET_KEY = "";  //OKCoin 申请的secret_key
 	private static String URL_PREX = "https://www.okcoin.cn";
  
 	private static String BUY = "buy";
